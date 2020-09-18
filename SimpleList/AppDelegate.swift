@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  SimpleList
 //
-//  Created by shimanopower on 9/9/20.
+//  Created by shimanopower on 9/18/20.
 //  Copyright © 2020 shimanopower. All rights reserved.
 //
 
@@ -10,9 +10,6 @@ import UIKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
-
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         return true
