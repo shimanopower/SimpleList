@@ -29,7 +29,7 @@ class SimpleList: UITableViewController, Storyboarded {
         title = "Items"
         fetchItemData()
         configureSearchController()
-        applySnapshot(animatingDifferences: false)
+        applySnapshot(animatingDifferences: true)
     }
     
     func fetchItemData() {
@@ -38,7 +38,12 @@ class SimpleList: UITableViewController, Storyboarded {
             guard let itemData = itemData else { return }
             let sorted = itemData.sorted(by: <)
             self.items = sorted.filter { $0.name != "" }
+            self.finishedFetching()
         }
+    }
+    
+    func finishedFetching() {
+        applySnapshot(animatingDifferences: true)
     }
     
     func makeDatasource() -> DataSource {
@@ -51,10 +56,8 @@ class SimpleList: UITableViewController, Storyboarded {
             } else {
                 sectionName = "No Section!"
             }
-            cell.titleLabel.text = "Section: \(sectionName) Name: \(item.name)"
-            let idInt = item.id ?? 0
-            let idString = String(idInt)
-            cell.subtitleLabel.text = "Id: \(idString)"
+            cell.nameLabel = "\(item.name) Section: \(sectionName)"
+            cell.idLabel = item.id
             return cell
         })
        return dataSource

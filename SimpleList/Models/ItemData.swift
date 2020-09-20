@@ -37,6 +37,6 @@ struct ItemData: Decodable, Hashable, Comparable {
     static func < (lhs: ItemData, rhs: ItemData) -> Bool {
         guard let leftSection = lhs.sectionIdentifier, let rightSection = rhs.sectionIdentifier else { return false }
         if leftSection < rightSection { return true }
-        else { return leftSection == rightSection && lhs < rhs }
+        else { return leftSection == rightSection && lhs.name < rhs.name }
     }
 }

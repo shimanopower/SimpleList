@@ -9,6 +9,14 @@
 import UIKit
 
 class ItemTableViewCell: UITableViewCell {
-    @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var subtitleLabel: UILabel!
+    @IBOutlet private weak var titleLabel: UILabel!
+    @IBOutlet private weak var subtitleLabel: UILabel!
+    
+    var nameLabel: String? {
+        didSet { titleLabel.text = nameLabel?.nameFormatted }
+    }
+    
+    var idLabel: Int? {
+        didSet { subtitleLabel.text = idLabel?.idFormatted}
+    }
 }
