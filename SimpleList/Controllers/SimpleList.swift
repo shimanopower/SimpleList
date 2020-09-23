@@ -59,8 +59,7 @@ class SimpleList: UITableViewController, Storyboarded {
             if currentSection == sectionName {
                 currentItems.append(item)
             } else {
-                let section = Section(title: currentSection, items: currentItems)
-                Section.sections.append(section)
+                Section.sections.append(Section(title: currentSection, items: currentItems))
                 currentSection = sectionName
                 currentItems.removeAll()
                 currentItems.append(item)
@@ -75,7 +74,7 @@ class SimpleList: UITableViewController, Storyboarded {
         self.dataSource = DataSource(tableView: tableView, cellProvider: {
             (tableView, indexPath, item) -> UITableViewCell? in
             guard let cell = tableView.dequeueReusableCell(withIdentifier: "ItemTableViewCell", for: indexPath) as? ItemTableViewCell else { fatalError() }
-            cell.nameLabel = "\(item.name)"
+            cell.nameLabel = item.name
             cell.idLabel = item.id
             return cell
         })
