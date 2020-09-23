@@ -11,13 +11,11 @@ import UIKit
 class SimpleList: UITableViewController, Storyboarded {
     weak var coordinator: MainCoordinator?
     var items = [ItemData]()
-//    var searchController = UISearchController(searchResultsController: nil)
+    var searchController = UISearchController(searchResultsController: nil)
     typealias Snapshot = NSDiffableDataSourceSnapshot<Section, ItemData>
     var dataSource: DataSource!
     
-    var sections: [Section] {
-        Section.sections
-    }
+    var sections: [Section] = Section.sections
     
     class DataSource: UITableViewDiffableDataSource<Section, ItemData> {
         override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -31,6 +29,7 @@ class SimpleList: UITableViewController, Storyboarded {
         assert(coordinator != nil, "You msut implement a coordinator")
         title = "Items"
         fetchItemData()
+        configureSearchController()
     }
     
     func fetchItemData() {
@@ -45,7 +44,6 @@ class SimpleList: UITableViewController, Storyboarded {
     }
     
     func finishedFetching() {
-//        configureSearchController()
         makeDatasource()
         applySnapshot(animatingDifferences: false)
     }
@@ -70,6 +68,7 @@ class SimpleList: UITableViewController, Storyboarded {
         }
         
         Section.sections.append(Section(title: currentSection, items: currentItems))
+        self.sections = Section.sections
     }
     
     func makeDatasource() {
@@ -95,24 +94,35 @@ class SimpleList: UITableViewController, Storyboarded {
 
 extension SimpleList: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
-        items = filteredItems(for: searchController.searchBar.text)
+        sections = filteredSections(for: searchController.searchBar.text)
         applySnapshot()
     }
     
-    func filteredItems(for query: String?) -> [ItemData] {
-        guard let search = query, !search.isEmpty else { return items }
-        let filtered = items
-        return filtered.filter {
-            return $0.name.lowercased().contains(search.lowercased())
+    func filteredSections(for query: String?) -> [Section] {
+        let sections = Section.sections
+        guard let search = query, !search.isEmpty else { return sections }
+     
+        return sections.filter { section in
+            var matches = section.section.lowercased().contains(search.lowercased())
+            for item in section.items {
+                let itemId = item.id ?? 0
+                let itemIdString = String(itemId)
+                if itemIdString.contains(search.lowercased()) {
+                    matches = true
+                    break
+                }
+            }
+            
+            return matches
         }
     }
     
-//    func configureSearchController() {
-//        searchController.searchResultsUpdater = self
-//        searchController.obscuresBackgroundDuringPresentation = false
-//        searchController.searchBar.placeholder = "Search Items"
-//        navigationItem.searchController = searchController
-//        definesPresentationContext = true
-//    }
+    func configureSearchController() {
+        searchController.searchResultsUpdater = self
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.placeholder = "Search by ID"
+        navigationItem.searchController = searchController
+        definesPresentationContext = true
+    }
 }
 
