@@ -12,16 +12,16 @@ extension String {
     var nameFormatted: String {
         "Name: " + self
     }
+    
+    var sectionFormatted: String {
+        let sectionString = String(self)
+        return "List ID: " + sectionString
+    }
 }
 
 extension Int {
     var idFormatted: String {
         let idString = String(self)
         return "ID: " + idString
-    }
-    
-    var sectionFormatted: String {
-        let sectionString = String(self)
-        return "List ID: " + sectionString
     }
 }

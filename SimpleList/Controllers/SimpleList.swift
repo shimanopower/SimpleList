@@ -10,26 +10,27 @@ import UIKit
 
 class SimpleList: UITableViewController, Storyboarded {
     weak var coordinator: MainCoordinator?
-    private var items = [ItemData]()
-//    private var filteredItems = [ItemData]()
-    private var searchController = UISearchController(searchResultsController: nil)
-    private lazy var dataSource = makeDatasource()
+    var items = [ItemData]()
+//    var searchController = UISearchController(searchResultsController: nil)
+    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, ItemData>
+    var dataSource: DataSource!
     
-    enum Section {
-        case main
+    var sections: [Section] {
+        Section.sections
     }
     
-    typealias DataSource = UITableViewDiffableDataSource<Section, ItemData>
-    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, ItemData>
+    class DataSource: UITableViewDiffableDataSource<Section, ItemData> {
+        override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+            let sectionKind = Section.sections
+            return sectionKind[section].section.sectionFormatted
+        }
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         assert(coordinator != nil, "You msut implement a coordinator")
         title = "Items"
         fetchItemData()
-        configureSearchController()
-        applySnapshot(animatingDifferences: true)
     }
     
     func fetchItemData() {
@@ -38,35 +39,56 @@ class SimpleList: UITableViewController, Storyboarded {
             guard let itemData = itemData else { return }
             let sorted = itemData.sorted(by: <)
             self.items = sorted.filter { $0.name != "" }
+            self.createSections()
             self.finishedFetching()
         }
     }
     
     func finishedFetching() {
-        applySnapshot(animatingDifferences: true)
+//        configureSearchController()
+        makeDatasource()
+        applySnapshot(animatingDifferences: false)
     }
     
-    func makeDatasource() -> DataSource {
-        let dataSource = DataSource(tableView: tableView, cellProvider: {
+    func createSections() {
+        var currentSection = ""
+        var currentItems = [ItemData]()
+           
+        for item in self.items.sorted(by: <) {
+            let sectionInt = item.sectionIdentifier ?? 0
+            let sectionName = String(sectionInt)
+            if currentSection == "" { currentSection = sectionName }
+            if currentSection == sectionName {
+                currentItems.append(item)
+            } else {
+                let section = Section(title: currentSection, items: currentItems)
+                Section.sections.append(section)
+                currentSection = sectionName
+                currentItems.removeAll()
+                currentItems.append(item)
+            }
+        }
+        
+        Section.sections.append(Section(title: currentSection, items: currentItems))
+    }
+    
+    func makeDatasource() {
+        self.dataSource = DataSource(tableView: tableView, cellProvider: {
             (tableView, indexPath, item) -> UITableViewCell? in
             guard let cell = tableView.dequeueReusableCell(withIdentifier: "ItemTableViewCell", for: indexPath) as? ItemTableViewCell else { fatalError() }
-            var sectionName: String
-            if let section = item.sectionIdentifier {
-                sectionName = "\(section)"
-            } else {
-                sectionName = "No Section!"
-            }
-            cell.nameLabel = "\(item.name) Section: \(sectionName)"
+            cell.nameLabel = "\(item.name)"
             cell.idLabel = item.id
             return cell
         })
-       return dataSource
     }
     
     func applySnapshot(animatingDifferences: Bool = true) {
         var snapShot = Snapshot()
-        snapShot.appendSections([.main])
-        snapShot.appendItems(items)
+        snapShot.appendSections(sections)
+        self.sections.forEach { section in
+            snapShot.appendItems(section.items, toSection: section)
+        }
+        
         dataSource.apply(snapShot, animatingDifferences: animatingDifferences)
     }
 }
@@ -85,13 +107,12 @@ extension SimpleList: UISearchResultsUpdating {
         }
     }
     
-    
-    func configureSearchController() {
-        searchController.searchResultsUpdater = self
-        searchController.obscuresBackgroundDuringPresentation = false
-        searchController.searchBar.placeholder = "Search Items"
-        navigationItem.searchController = searchController
-        definesPresentationContext = true
-    }
+//    func configureSearchController() {
+//        searchController.searchResultsUpdater = self
+//        searchController.obscuresBackgroundDuringPresentation = false
+//        searchController.searchBar.placeholder = "Search Items"
+//        navigationItem.searchController = searchController
+//        definesPresentationContext = true
+//    }
 }
 
