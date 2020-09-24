@@ -100,19 +100,12 @@ extension SimpleList: UISearchResultsUpdating {
     func filteredSections(for query: String?) -> [Section] {
         let sections = Section.sections
         guard let search = query, !search.isEmpty else { return sections }
-     
+        
         return sections.filter { section in
-            var matches = section.section.lowercased().contains(search.lowercased())
-            for item in section.items {
-                let itemId = item.id ?? 0
-                let itemIdString = String(itemId)
-                if itemIdString.contains(search.lowercased()) {
-                    matches = true
-                    break
-                }
+            let newItems = section.items.filter { item in
+                item.searchByID(search)
             }
-            
-            return matches
+            return !newItems.isEmpty
         }
     }
     
@@ -121,6 +114,7 @@ extension SimpleList: UISearchResultsUpdating {
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.placeholder = "Search by ID"
         navigationItem.searchController = searchController
+        searchController.searchBar.keyboardType = .numberPad
         definesPresentationContext = true
     }
 }

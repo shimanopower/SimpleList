@@ -45,4 +45,13 @@ struct ItemData: Decodable, Hashable, Comparable {
             
             return leftSection == rightSection && lInt < rInt }
     }
+    
+    func searchByID(_ filter: String?) -> Bool {
+        guard let filterText = filter else { return true }
+        if filterText.isEmpty { return true }
+        let id = self.id ?? 0
+        let idString = String(id)
+//        return idString.contains(filterText)
+        return idString == filterText
+    }
 }

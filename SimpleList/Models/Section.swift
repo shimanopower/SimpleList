@@ -18,7 +18,7 @@ class Section: Hashable {
     var section: String {
         title
     }
-    
+  
     init(title: String, items: [ItemData]) {
         self.title = title
         self.items = items
