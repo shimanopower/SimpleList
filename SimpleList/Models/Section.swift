@@ -31,4 +31,8 @@ class Section: Hashable {
     static func == (lhs: Section, rhs: Section) -> Bool {
         lhs.id == rhs.id
     }
+
+    func filterItems(_ search: String) -> [ItemData] {
+        self.items.filter { $0.id! == Int(search) || String($0.id!).hasPrefix(search) }
+    }
 }

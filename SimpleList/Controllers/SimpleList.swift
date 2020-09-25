@@ -101,12 +101,15 @@ extension SimpleList: UISearchResultsUpdating {
         let sections = Section.sections
         guard let search = query, !search.isEmpty else { return sections }
         
-        return sections.filter { section in
-            let newItems = section.items.filter { item in
-                item.searchByID(search)
-            }
-            return !newItems.isEmpty
+        var filtereSections = [Section]()
+        
+        for section in sections {
+            let filteredItems = section.filterItems(search)
+            let newSection = Section(title: section.section, items: filteredItems)
+            filtereSections.append(newSection)
         }
+        
+        return filtereSections
     }
     
     func configureSearchController() {
