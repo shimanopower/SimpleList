@@ -17,6 +17,9 @@ class SimpleList: UITableViewController, Storyboarded {
     
     var sections: [Section] = Section.sections
     
+// Mark: Subclassing UITableViewDiffableDataSource
+// Subclassling UITableViewDiffableDataSource was the easiest way I've found to use diffable datssource to provide titles to sections. This is one Apple's own implementations shown at WWDC19 Advances in Datasources talk
+    
     class DataSource: UITableViewDiffableDataSource<Section, ItemData> {
         override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
             let sectionKind = Section.sections
@@ -47,6 +50,8 @@ class SimpleList: UITableViewController, Storyboarded {
         makeDatasource()
         applySnapshot(animatingDifferences: false)
     }
+    
+    // Mark: Here our sections are created by reading section identifier from ItemData and using it instantiate Sections and add them into our sections array
     
     func createSections() {
         var currentSection = ""
@@ -90,6 +95,8 @@ class SimpleList: UITableViewController, Storyboarded {
         dataSource.apply(snapShot, animatingDifferences: animatingDifferences)
     }
 }
+
+// MarK: Search / Filtering methods
 
 extension SimpleList: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
