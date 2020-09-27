@@ -30,6 +30,7 @@ class SimpleList: UITableViewController, Storyboarded {
     override func viewDidLoad() {
         super.viewDidLoad()
         assert(coordinator != nil, "You msut implement a coordinator")
+        navigationController?.navigationBar.prefersLargeTitles = true
         title = "Items"
         fetchItemData()
         configureSearchController()
